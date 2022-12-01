@@ -21,6 +21,7 @@ fn read_input(path: &str) -> Vec<ElfInventory> {
         }
     }
 
+    calories.push(elf);
     calories
 }
 
@@ -32,9 +33,21 @@ fn highest_calories(elves: &Vec<ElfInventory>) -> Calorie {
         .unwrap()
 }
 
+fn highest_three_calories(elves: &Vec<ElfInventory>) -> Calorie {
+    let mut calories: Vec<Calorie> = elves
+        .iter()
+        .map(|elf| elf.iter().sum())
+        .collect();
+
+    calories.sort();
+
+    calories.iter().rev().take(3).sum()
+}
+
 fn main() {
     let elves = read_input("input.txt");
     println!("Part One: {}", highest_calories(&elves));
+    println!("Part Two: {}", highest_three_calories(&elves));
 
 }
 
@@ -42,6 +55,12 @@ fn main() {
 fn test_part_one() {
     let elves = read_input("test-part-1.txt");
     assert_eq!(highest_calories(&elves), 24000);
+}
+
+#[test]
+fn test_part_two() {
+    let elves = read_input("test-part-1.txt");
+    assert_eq!(highest_three_calories(&elves), 45000);
 }
 
 

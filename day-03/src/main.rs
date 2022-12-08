@@ -37,9 +37,45 @@ fn sum_priorities(packs: &Vec<String>) -> u32 {
         .sum()
 }
 
+struct TakeThree<I> {
+    iter: I
+}
+
+impl <'a, I> Iterator for TakeThree<I> where I: Iterator<Item=&'a String> {
+    type Item = (&'a String, &'a String, &'a String);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        Some((
+            self.iter.next()?,
+            self.iter.next()?,
+            self.iter.next()?
+        ))
+    }
+}
+
+fn find_common_item(one: &str, two: &str, three: &str) -> char {
+    for item in one.chars() {
+        if two.contains(item) && three.contains(item) {
+            return item;
+        }
+    }
+
+    panic!()
+}
+
+fn sum_badges(packs: &Vec<String>) -> u32 {
+    let iter = TakeThree { iter: packs.iter() };
+
+    iter
+        .map(|(one, two, three)| find_common_item(one, two, three))
+        .map(|item| priority(item))
+        .sum()
+}
+
 fn main() {
     let packs = read_input("input");
     println!("Part one: {}", sum_priorities(&packs));
+    println!("Part two: {}", sum_badges(&packs));
 }
 
 #[test]
@@ -52,4 +88,10 @@ fn test_part_one() {
 
     let packs = read_input("test");
     assert_eq!(sum_priorities(&packs), 157);
+}
+
+#[test]
+fn test_part_two() {
+    let packs = read_input("test");
+    assert_eq!(sum_badges(&packs), 70);
 }

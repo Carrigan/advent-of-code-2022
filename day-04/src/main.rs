@@ -36,6 +36,16 @@ fn fully_overlap(one: &Range, two: &Range) -> bool {
     false
 }
 
+fn somewhat_overlap(one: &Range, two: &Range) -> bool {
+    for i in one.0 ..= one.1 {
+        if i >= two.0 && i <= two.1 {
+            return true;
+        }
+    }
+
+    false
+}
+
 fn count_fully_overlapping(sections: &Vec<(Range, Range)>) -> u32 {
     sections
         .iter()
@@ -44,13 +54,28 @@ fn count_fully_overlapping(sections: &Vec<(Range, Range)>) -> u32 {
         .sum()
 }
 
+fn count_somewhat_overlapping(sections: &Vec<(Range, Range)>) -> u32 {
+    sections
+        .iter()
+        .map(|(r1, r2)| somewhat_overlap(r1, r2))
+        .map(|overlap| if overlap { 1 } else { 0 })
+        .sum()
+}
+
 fn main() {
     let sections = read_input("input");
     println!("Part one: {}", count_fully_overlapping(&sections));
+    println!("Part one: {}", count_somewhat_overlapping(&sections));
 }
 
 #[test]
 fn test_part_one() {
     let sections = read_input("test");
     assert_eq!(count_fully_overlapping(&sections), 2);
+}
+
+#[test]
+fn test_part_two() {
+    let sections = read_input("test");
+    assert_eq!(count_somewhat_overlapping(&sections), 4);
 }

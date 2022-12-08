@@ -14,6 +14,26 @@ impl Entry {
             Entry::Scissors => 3
         }
     }
+
+    fn find_matching(theirs: &Entry, pair_by: char) -> Entry {
+        match theirs {
+            Entry::Rock => match pair_by {
+                'X' => Entry::Scissors,
+                'Y' => Entry::Rock,
+                _ => Entry::Paper
+            },
+            Entry::Paper => match pair_by {
+                'X' => Entry::Rock,
+                'Y' => Entry::Paper,
+                _ => Entry::Scissors
+            },
+            Entry::Scissors => match pair_by {
+                'X' => Entry::Paper,
+                'Y' => Entry::Scissors,
+                _ => Entry::Rock
+            },
+        }
+    }
 }
 
 struct Game {
@@ -22,7 +42,7 @@ struct Game {
 }
 
 impl Game {
-    fn from_str(line: &str) -> Option<Game> {
+    fn from_p1_str(line: &str) -> Option<Game> {
         let theirs: Entry = match line.chars().nth(0).unwrap() {
             'A' => Entry::Rock,
             'B' => Entry::Paper,
@@ -36,6 +56,19 @@ impl Game {
             'Z' => Entry::Scissors,
             _ => panic!()
         };
+
+        Some(Game { mine, theirs })
+    }
+
+    fn from_p2_str(line: &str) -> Option<Game> {
+        let theirs: Entry = match line.chars().nth(0).unwrap() {
+            'A' => Entry::Rock,
+            'B' => Entry::Paper,
+            'C' => Entry::Scissors,
+            _ => panic!()
+        };
+
+        let mine: Entry = Entry::find_matching(&theirs, line.chars().nth(2).unwrap());
 
         Some(Game { mine, theirs })
     }
@@ -62,7 +95,16 @@ fn read_input(path: &str) -> Vec<Game> {
 
     input
         .lines()
-        .map(|line| Game::from_str(line).unwrap())
+        .map(|line| Game::from_p1_str(line).unwrap())
+        .collect()
+}
+
+fn read_input_part_2(path: &str) -> Vec<Game> {
+    let input = fs::read_to_string(path).expect("File path must be valid");
+
+    input
+        .lines()
+        .map(|line| Game::from_p2_str(line).unwrap())
         .collect()
 }
 
@@ -76,10 +118,19 @@ fn total_score(games: &Vec<Game>) -> u32 {
 fn main() {
     let games = read_input("input");
     println!("Part one: {}", total_score(&games));
+
+    let games = read_input_part_2("input");
+    println!("Part two: {}", total_score(&games));
 }
 
 #[test]
 fn test_part_one() {
     let games = read_input("test");
     assert_eq!(total_score(&games), 15);
+}
+
+#[test]
+fn test_part_two() {
+    let games = read_input_part_2("test");
+    assert_eq!(total_score(&games), 12);
 }

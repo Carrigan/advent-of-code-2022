@@ -94,6 +94,25 @@ fn perform_moves(stacks: &mut Stacks, instructions: &Vec<Instruction>) {
     }
 }
 
+fn perform_moves_9001(stacks: &mut Stacks, instructions: &Vec<Instruction>) {
+    for instruction in instructions {
+        // Pop the elements into a temporary vec
+        let mut temporary = Vec::new();
+
+        for _ in 0..instruction.count {
+            let top = stacks[instruction.from as usize - 1].pop().unwrap();
+            temporary.push(top);
+        }
+
+        // Pop out of the temporary vec to destination
+        let size = temporary.len();
+        for _ in 0..size {
+            stacks[instruction.to as usize - 1].push(temporary.pop().unwrap());
+        }
+    }
+
+}
+
 fn last_elements(stacks: &Stacks) -> Vec<char> {
     stacks
         .iter()
@@ -106,6 +125,10 @@ fn main() {
     let (mut stacks, instructions) = read_input("input.txt");
     perform_moves(&mut stacks, &instructions);
     println!("{:?}", last_elements(&stacks));
+
+    let (mut stacks, instructions) = read_input("input.txt");
+    perform_moves_9001(&mut stacks, &instructions);
+    println!("{:?}", last_elements(&stacks));
 }
 
 #[test]
@@ -117,10 +140,21 @@ fn test_part_one() {
     assert_eq!(*stacks.get(2).unwrap().get(0).unwrap(), 'P');
 
     perform_moves(&mut stacks, &instructions);
-    println!("{:?} {:?} {:?}", stacks[0], stacks[1], stacks[2]);
     let lasts = last_elements(&stacks);
 
     assert_eq!(lasts[0], 'C');
     assert_eq!(lasts[1], 'M');
     assert_eq!(lasts[2], 'Z');
+}
+
+#[test]
+fn test_part_two() {
+    let (mut stacks, instructions) = read_input("test");
+
+    perform_moves_9001(&mut stacks, &instructions);
+    let lasts = last_elements(&stacks);
+
+    assert_eq!(lasts[0], 'M');
+    assert_eq!(lasts[1], 'C');
+    assert_eq!(lasts[2], 'D');
 }
